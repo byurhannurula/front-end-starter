@@ -1,0 +1,40 @@
+// 1
+@function em($pixels, $context: 16px)
+	@if(unitless($pixels))
+		$pixels: $pixels * 1px
+	@if(unitless($context))
+		$context: $context * 1px
+
+	@return $pixels / $context * 1em
+
+// 2
+@function rem($pixels, $context: 16px)
+	@if(unitless($pixels))
+		$pixels: $pixels * 1px
+	@if(unitless($context))
+		$context: $context * 1px
+
+	@return $pixels / $context * 1rem
+
+// 3
+@function in-ratio($width, $height)
+    @return ($height / $width) * 100%
+
+// 4
+@mixin clearfix
+	&:before,
+	&:after
+		content: ''
+		display: table
+		clear: both
+
+// 5
+@mixin visually-hidden
+	border: 0
+	width: 1px
+	height: 1px
+	padding: 0
+	margin: -1px
+	overflow: hidden
+	position: absolute
+	clip: rect(0 0 0 0)

@@ -1,3 +1,15 @@
 # HTML5 Boilerplate
 
-> Starter boilerplate kit for front-end projects.
+> Boilerplate kit for front-end projects.
+
+- - - -
+
+## Installing
+
+```bash
+# install dependencies
+npm install
+
+# serve with hot reload at localhost:3000
+npm start
+```
