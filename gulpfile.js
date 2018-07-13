@@ -2,18 +2,18 @@
 
 const gulp = require('gulp');
 const sass = require('gulp-sass');
-const plumber = require('gulp-plumber');
-const cssnano = require('gulp-cssnano');
-const imagemin = require('gulp-imagemin');
+const cssnano = require('cssnano');
+const prefix = require('autoprefixer');
+const viewsRender = require('gulp-pug');
+const $ = require('gulp-load-plugins')();
 const pngquant = require('imagemin-pngquant');
-const autoprefixer = require('gulp-autoprefixer');
 const browserSync = require('browser-sync').create();
 
 // Paths
 const src = './source';
 const dist = './build';
 
-const srcPaths = {
+const srcpaths = {
 	html: `${src}/views`,
   css: `${src}/sass`,
   js: `${src}/js`,
@@ -21,7 +21,7 @@ const srcPaths = {
   fonts: `${src}/fonts`
 };
 
-const distPaths = {
+const distpaths = {
   html: `${dist}`,
   css: `${dist}/css`,
   js: `${dist}/js`,
@@ -29,18 +29,16 @@ const distPaths = {
   fonts: `${dist}/fonts`
 };
 
+const error = (error) => {
+	console.log(error.message);
+};
+
 // Compile HTML
 gulp.task('views', () => {
-	return gulp.src([`${srcPaths.html}/*.html`])
-    .pipe(gulp.dest(distPaths.html))
-    .pipe(browserSync.reload({
-      stream: true
-    }));
-});
-
-gulp.task('scripts', () => {
-  return gulp.src(`${srcPaths.js}/**/*.js`)
-    .pipe(gulp.dest(distPaths.js))
+	return gulp.src(`${srcpaths.html}/*.pug`)
+		.pipe($.plumber({errorHandler: error}))
+		.pipe(viewsRender())
+    .pipe(gulp.dest(distpaths.html))
     .pipe(browserSync.reload({
       stream: true
     }));
@@ -48,33 +46,37 @@ gulp.task('scripts', () => {
 
 // Compile SCSS to CSS
 gulp.task('styles', () => {
-  return gulp.src([`${srcPaths.css}/main.sass`])
-    .pipe(plumber())
-		.pipe(sass())
-    .pipe(autoprefixer(['last 10 versions', '> 1%', 'ie 8', 'ie 7'], { cascade: true }))
-    .pipe(cssnano({
-      discardComments: { removeAll: true }
-    }))
-    .pipe(gulp.dest(distPaths.css))
-    .pipe(browserSync.reload({
-      stream: true
-    }));
+	const plugins = [
+		prefix({ browsers: ['last 2 versions'] }),
+		cssnano({ discardComments: { removeAll: true } })
+	];
+
+	return gulp.src(`${srcpaths.css}/main.sass`)
+		.pipe($.plumber({errorHandler: error}))
+		.pipe($.sass())
+		.pipe($.postcss(plugins))
+    .pipe(gulp.dest(distpaths.css))
+    .pipe(browserSync.stream());
+});
+
+gulp.task('scripts', () => {
+	return gulp.src(`${srcpaths.js}/**/*.js`)
+		.pipe($.plumber({errorHandler: error}))
+    .pipe(gulp.dest(distpaths.js))
+    .pipe(browserSync.stream());
 });
 
 // Minify images/icons/svg
 gulp.task('images', () => {
-  return gulp.src(`${srcPaths.img}/**/*`)
-    .pipe(imagemin({
+  return gulp.src(`${srcpaths.img}/**/*`)
+    .pipe($.imagemin({
 			progressive: true,
 			svgoPlugins: [{
 				removeViewBox: false
 			}],
 			use: [pngquant()]
     }))
-    .pipe(gulp.dest(distPaths.img))
-    .pipe(browserSync.reload({
-      stream: true
-    }));
+    .pipe(gulp.dest(distpaths.img));
 });
 
 // Serve
@@ -85,9 +87,9 @@ gulp.task('serve', ['views', 'styles', 'scripts', 'images'], () => {
 		}
 	});
 
-	gulp.watch(`${srcPaths.html}/*.html`, ['views']);
-	gulp.watch(`${srcPaths.js}/**/*.js`, ['scripts']);
-	gulp.watch(`${srcPaths.css}/**/*.sass`, ['styles']);
+	gulp.watch(`${srcpaths.js}/**/*.js`, ['scripts']);
+	gulp.watch(`${srcpaths.css}/**/*.sass`, ['styles']);
+	gulp.watch(`${srcpaths.html}/*.+(html|pug)`, ['views']);
 });
 
 

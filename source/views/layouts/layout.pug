@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+html(lang="en")
+	head
+		meta(charset='UTF-8')
+		meta(http-equiv='X-UA-Compatible', content='ie=edge')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+
+		//- Open Graph cards
+		meta(property='og:type', content='website')
+		meta(property='og:url', content='')
+		meta(property='og:title', content='')
+		meta(property='og:description', content='')
+		meta(property='og:image', content='')
+
+		//- Twitter cards
+		meta(name='twitter:card', content='summary_large_image')
+		meta(name='twitter:url', content='')
+		meta(name='twitter:title', content='')
+		meta(name='twitter:description', content='')
+		meta(name='twitter:image', content='')
+
+		link(rel='stylesheet', href='/css/main.css')
+		title Front-End Boilerplate
+
+	body
+		noscript
+			p(style='text-align: center') JavaScript is turned off in your browser. For the best experience please turn on JavaScript. Find out
+				a(href='http://www.enable-javascript.com/', target='_blank')  how to turn javascript on.
+
+		include ../partials/header
+
+		main(role='main')
+			block content
+
+		include ../partials/footer
+
+		block scripts
+			script(src='/js/main.js')
