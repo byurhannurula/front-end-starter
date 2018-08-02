@@ -1,0 +1,72 @@
+// 1
+@function em($pixels, $context: 16px) {
+	@if(unitless($pixels)) {
+		$pixels: $pixels * 1px;
+	}
+
+	@if(unitless($context)) {
+		$context: $context * 1px;
+	}
+
+	@return $pixels / $context * 1em;
+}
+
+// 2
+@function rem($pixels, $context: 16px) {
+	@if(unitless($pixels)) {
+		$pixels: $pixels * 1px;
+	}
+
+	@if(unitless($context)) {
+		$context: $context * 1px;
+	}
+
+	@return $pixels / $context * 1rem;
+}
+
+// 3
+@mixin clearfix {
+	&:after {
+		content: '';
+		display: table;
+		clear: both;
+	}
+}
+
+// 4
+@mixin hidden {
+	border: 0;
+	width: 1px;
+	padding: 0;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	position: absolute;
+	clip: rect(0 0 0 0);
+}
+
+// Responsive design mixins
+@mixin respond-max($breakpoint) {
+	$max-width: $breakpoint - em(1px);
+
+	@media screen and (max-width: $max-width) {
+		@content;
+	}
+}
+
+@mixin respond-min($breakpoint) {
+	$min-width: $breakpoint;
+
+	@media screen and (min-width: $min-width) {
+		@content;
+	}
+}
+
+@mixin respond-min-max($breakpoint-min, $breakpoint-max) {
+	$min-width: $breakpoint-min;
+	$max-width: $breakpoint-max - em(1px);
+
+	@media screen and (min-width: $min-width) and (max-width: $max-width) {
+		@content;
+	}
+}

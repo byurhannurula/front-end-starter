@@ -1,0 +1,22 @@
+@charset 'UTF-8';
+
+// 1. Vendros and plugins
+@import 'vendors/normalize';
+
+// 2. Configuration and helpers
+@import 'abstracts/variables';
+@import 'abstracts/mixins';
+
+// 3. Base styles
+@import 'base/base';
+@import 'base/typography';
+
+// 4. Components
+@import 'components/button';
+@import 'components/link';
+
+// 5. Section-specific styles
+@import 'layouts/header';
+
+// 4. Page-specific styles
+@import 'pages/example-page';
