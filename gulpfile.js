@@ -1,114 +1,101 @@
 const gulp = require('gulp')
-const plugin = require('gulp-load-plugins')()
-const include = require('gulp-file-include')
-const htmlBeautify = require('gulp-html-beautify')
+const { sync } = require('del')
+const $ = require('gulp-load-plugins')()
 const browserSync = require('browser-sync').create()
-const chalk = require('chalk')
-const del = require('del')
 
-const { paths, tasks } = require('./config')
+const { routes, tasks } = require('./config')
+
+const dev = $.environments.development
+const prod = $.environments.production
 
 const errorMessage = err => console.log(err.message)
-const glog = console.log
 
-gulp.task('compileViews', done => {
-  glog(chalk.red.bold('— Gulp: Compiling Views files...'))
-
+gulp.task('views', done => {
   gulp
-    .src(`${paths.src.views}/*.html`)
-    .pipe(plugin.plumber({ errorHandler: errorMessage }))
+    .src(`${routes.src.views}/*.+(html|pug)`)
+    .pipe($.plumber({ errorHandler: errorMessage }))
+    .pipe($.pug())
     .pipe(
-      include({
-        prefix: '@',
-        basepath: paths.src.views
-      })
-    )
-    .pipe(
-      htmlBeautify({
+      $.htmlBeautify({
         indent_with_tabs: true,
         indent_size: 2
       })
     )
-    .pipe(gulp.dest(paths.dist.views))
+    .pipe(gulp.dest(routes.dist.views))
     .pipe(browserSync.reload({ stream: true }))
 
   done()
 })
 
-gulp.task('compileStyles', done => {
-  glog(chalk.red.bold('— Gulp: Compiling SASS files...'))
-
+gulp.task('styles', done => {
   gulp
-    .src(`${paths.src.styles}/app.scss`)
-    .pipe(plugin.plumber({ errorHandler: errorMessage }))
-    .pipe(plugin.sass())
-    .pipe(plugin.autoprefixer())
-    .pipe(gulp.dest(paths.dist.styles))
+    .src(`${routes.src.styles}/app.scss`)
+    .pipe($.plumber({ errorHandler: errorMessage }))
+    .pipe(dev($.sourcemaps.init()))
+    .pipe($.sass())
+    .pipe($.autoprefixer())
+    .pipe($.cssnano())
+    .pipe(dev($.sourcemaps.write('.')))
+    .pipe(gulp.dest(routes.dist.styles))
+    .pipe(browserSync.stream())
+
+  done()
+})
+
+gulp.task('scripts', done => {
+  gulp
+    .src(`${routes.src.scripts}/**/*.js`)
+    .pipe($.plumber({ errorHandler: errorMessage }))
+    .pipe($.concat('app.js'))
+    .pipe($.uglify())
+    .pipe(gulp.dest(routes.dist.scripts))
     .pipe(browserSync.reload({ stream: true }))
 
   done()
 })
 
-gulp.task('compileScripts', done => {
-  glog(chalk.red.bold('— Gulp: Compiling/Minifying JavaScript files...'))
+gulp.task('images', done => {
   gulp
-    .src(`${paths.src.scripts}/**/*.js`)
-    .pipe(plugin.plumber({ errorHandler: errorMessage }))
-    .pipe(plugin.concat('app.js'))
-    .pipe(plugin.uglify())
-    .pipe(gulp.dest(paths.dist.scripts))
-    .pipe(browserSync.reload({ stream: true }))
-
-  done()
-})
-
-gulp.task('optimizeImages', done => {
-  glog(chalk.red.bold('— Gulp: Optimizing images...'))
-
-  gulp
-    .src(`${paths.src.img}/**/*.*`)
-    .pipe(plugin.plumber({ errorHandler: errorMessage }))
+    .src(`${routes.src.img}/**/*.*`)
+    .pipe($.plumber({ errorHandler: errorMessage }))
     .pipe(
-      plugin.imagemin([
-        plugin.imagemin.gifsicle({ interlaced: true }),
-        plugin.imagemin.jpegtran({ progressive: true }),
-        plugin.imagemin.optipng({ optimizationLevel: 5 }),
-        plugin.imagemin.svgo({
+      $.imagemin([
+        $.imagemin.gifsicle({ interlaced: true }),
+        $.imagemin.jpegtran({ progressive: true }),
+        $.imagemin.optipng({ optimizationLevel: 5 }),
+        $.imagemin.svgo({
           plugins: [{ removeViewBox: true }]
         })
       ])
     )
-    .pipe(gulp.dest(paths.dist.img))
+    .pipe(gulp.dest(routes.dist.img))
     .pipe(browserSync.reload({ stream: true }))
 
   done()
 })
 
-gulp.task('startServer', done => {
-  glog(chalk.red.bold('— Gulp: Starting server...'))
-
+gulp.task('server', done => {
   browserSync.init({
     notify: false,
     open: false,
     server: {
-      baseDir: paths.dist
+      baseDir: routes.dist
     }
   })
 
   done()
 })
 
-gulp.task('cleanDist', done => {
-  glog(chalk.red.bold('— Gulp: Cleanin Build folder...'))
-  del.sync(paths.dist.views)
+gulp.task('clean', done => {
+  sync(routes.dist.views)
   done()
 })
 
-gulp.task('watchFiles', () => {
-  gulp.watch(`${paths.watch.views}`, gulp.series('compileViews'))
-  gulp.watch(`${paths.watch.styles}`, gulp.series('compileStyles'))
-  gulp.watch(`${paths.watch.scripts}`, gulp.series('compileScripts'))
+gulp.task('watch', () => {
+  gulp.watch(`${routes.watch.views}`, gulp.series('views'))
+  gulp.watch(`${routes.watch.styles}`, gulp.series('styles'))
+  gulp.watch(`${routes.watch.scripts}`, gulp.series('scripts'))
 })
 
-exports.dev = gulp.series('cleanDist', tasks.dev)
-exports.build = gulp.series('cleanDist', tasks.build)
+exports.dev = gulp.series('clean', tasks.dev)
+exports.build = gulp.series('clean', tasks.build)

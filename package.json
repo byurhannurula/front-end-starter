@@ -3,8 +3,14 @@
   "version": "2.0.0",
   "name": "front-end-starter",
   "description": "Starting point for HTML/CSS/JS front-end projects.",
-  "author": "Byurhan Beyzat <byurhanbeyzat@gmail.com>",
+  "author": "Byurhan Beyzat <hi@byurhanbeyzat.com>",
   "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf build/",
+    "dev": "NODE_ENV=development gulp dev",
+    "build": "NODE_ENV=production gulp build",
+    "format": "prettier --write '{*.js,src/**/*.js}'"
+  },
   "dependencies": {
     "chalk": "^3.0.0",
     "del": "^5.1.0"
@@ -15,22 +21,18 @@
     "gulp-autoprefixer": "^7.0.1",
     "gulp-concat": "^2.6.1",
     "gulp-cssnano": "^2.1.3",
-    "gulp-file-include": "^2.0.1",
+    "gulp-environments": "^1.0.0",
     "gulp-html-beautify": "^1.0.1",
     "gulp-imagemin": "^6.0.0",
-    "gulp-load-plugins": "^2.0.1",
+    "gulp-load-plugins": "^2.0.2",
     "gulp-nunjucks-render": "^2.2.3",
     "gulp-plumber": "^1.2.1",
+    "gulp-pug": "^4.0.1",
     "gulp-rename": "^1.4.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify": "^3.0.2",
     "prettier": "^1.17.1"
-  },
-  "scripts": {
-    "dev": "gulp dev",
-    "build": "gulp build",
-    "format": "prettier --write '{*.js,src/**/*.js}'"
   },
   "browserslist": [
     "last 2 version"

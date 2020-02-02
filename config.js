@@ -1,5 +1,5 @@
 module.exports = {
-  paths: {
+  routes: {
     src: {
       views: `./src/views`,
       styles: `./src/styles`,
@@ -15,20 +15,13 @@ module.exports = {
       img: `./build/images`
     },
     watch: {
-      views: `./src/views/**/*.+(html|tpl)`,
+      views: `./src/views/**/*.+(html|pug)`,
       styles: `./src/styles/**/*.scss`,
       scripts: `./src/scripts/**/*.js`
     }
   },
   tasks: {
-    dev: [
-      `compileViews`,
-      `compileStyles`,
-      `compileScripts`,
-      `optimizeImages`,
-      `startServer`,
-      `watchFiles`
-    ],
-    build: [`compileViews`, `compileStyles`, `compileScripts`, `optimizeImages`]
+    dev: [`views`, `styles`, `scripts`, `images`, `server`, `watch`],
+    build: [`views`, `styles`, `scripts`, `images`]
   }
 }
